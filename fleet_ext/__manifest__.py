@@ -3,6 +3,7 @@
 {
     'name' : 'Fleet Management extension',
     'version' : '10.1',
+    'author': 'Stella Fredö in Sweden',
     'sequence': 166,
     'category': 'Human Resources',
     'website' : 'https://se.linkedin.com/in/stella-fredö-94401014',
