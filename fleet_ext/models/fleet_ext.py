@@ -3,7 +3,6 @@
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, tools, _
-from odoo.exceptions import UserError
 from odoo.exceptions import ValidationError
 
 
@@ -26,48 +25,6 @@ class FleetVehicle(models.Model):
     def _compute_vehicle_name(self):
         for record in self:
             record.name = record.license_plate + '/' + record.model_id.name + '/' + record.model_id.brand_id.name
-
-    @api.onchange('model_id')
-    def _onchange_model(self):
-        if self.model_id:
-            self.image_medium = self.model_id.image
-        else:
-            self.image_medium = False
-
-    @api.model
-    def create(self, data):
-        vehicle = super(FleetVehicle, self.with_context(mail_create_nolog=True)).create(data)
-        vehicle.message_post(body=_('%s %s has been added to the fleet!') % (vehicle.model_id.name, vehicle.license_plate))
-        return vehicle
-
-    @api.multi
-    def write(self, vals):
-        """
-        This function write an entry in the openchatter whenever we change important information
-        on the vehicle like the model, the drive, the state of the vehicle or its license plate
-        """
-        for vehicle in self:
-            changes = []
-            if 'model_id' in vals and vehicle.model_id.id != vals['model_id']:
-                value = self.env['fleet.vehicle.model'].browse(vals['model_id']).name
-                oldmodel = vehicle.model_id.name or _('None')
-                changes.append(_("Model: from '%s' to '%s'") % (oldmodel, value))
-            if 'driver_id' in vals and vehicle.driver_id.id != vals['driver_id']:
-                value = self.env['res.partner'].browse(vals['driver_id']).name
-                olddriver = (vehicle.driver_id.name) or _('None')
-                changes.append(_("Driver: from '%s' to '%s'") % (olddriver, value))
-            if 'state_id' in vals and vehicle.state_id.id != vals['state_id']:
-                value = self.env['fleet.vehicle.state'].browse(vals['state_id']).name
-                oldstate = vehicle.state_id.name or _('None')
-                changes.append(_("State: from '%s' to '%s'") % (oldstate, value))
-            if 'license_plate' in vals and vehicle.license_plate != vals['license_plate']:
-                old_license_plate = vehicle.license_plate or _('None')
-                changes.append(_("License Plate: from '%s' to '%s'") % (old_license_plate, vals['license_plate']))
-
-            if len(changes) > 0:
-                self.message_post(body=", ".join(changes))
-
-            return super(FleetVehicle, self).write(vals)
 
     @api.one
     @api.constrains('vin_sn')

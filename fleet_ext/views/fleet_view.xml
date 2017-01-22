@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-
-
+    <data>
         <record id='fleet_vehicle_view_form' model='ir.ui.view'>
             <field name="name">fleet.vehicle.form</field>
             <field name="model">fleet.vehicle</field>
@@ -165,4 +164,5 @@
                </search>
             </field>
         </record>
+     </data>
 </odoo>
